@@ -2,8 +2,8 @@
 
 use std::hash::{Hash, Hasher};
 
-use rand::Rng;
 use itertools::Itertools;
+use rand::Rng;
 
 #[derive(Debug, Clone)]
 struct Node {
@@ -27,7 +27,13 @@ impl Eq for Node {}
 
 fn random_nodes(N: usize) -> Vec<Node> {
     let mut rng = rand::thread_rng();
-    (0..N).map(|i| Node { id: i, x: rng.gen::<f64>(), y: rng.gen::<f64>()}).collect()
+    (0..N)
+        .map(|i| Node {
+            id: i,
+            x: rng.gen::<f64>(),
+            y: rng.gen::<f64>(),
+        })
+        .collect()
 }
 
 /// euclidian distance between 2 nodes
@@ -41,7 +47,7 @@ fn get_tour_length(nodes: &[&Node]) -> f64 {
     for window_slice in nodes.windows(2) {
         match window_slice {
             [n1, n2] => length += node_distance(n1, n2),
-            _ => unreachable!(".windows should guarantee slices of 2 always")
+            _ => unreachable!(".windows should guarantee slices of 2 always"),
         }
     }
     length
@@ -59,7 +65,7 @@ fn tsp_brute_force(nodes: &Vec<Node>) -> Vec<f64> {
     // loop over all possible unique tours
     for tour in nodes.iter().permutations(nodes.len()).unique() {
         let new_length = get_tour_length(&tour);
-        if  new_length < optimal_length {
+        if new_length < optimal_length {
             optimal_length = new_length;
             optimization_hc.push(optimal_length);
         }
@@ -85,7 +91,7 @@ fn tsp_nearest_neighbor(nodes: &Vec<Node>) -> Vec<Node> {
                 let mut nn_position: usize = 0;
                 for (i, node) in leftovers.iter().enumerate() {
                     let new_distance = node_distance(node, last_neighbor);
-                    if  new_distance < smallest_distance {
+                    if new_distance < smallest_distance {
                         smallest_distance = new_distance;
                         nn_position = i;
                     }
@@ -93,7 +99,6 @@ fn tsp_nearest_neighbor(nodes: &Vec<Node>) -> Vec<Node> {
 
                 nearest_neighbor.push(leftovers.swap_remove(nn_position));
             }
-
         }
     }
 
@@ -113,12 +118,21 @@ fn main() {
     let nodes = random_nodes(N);
 
     // println!("{:?}", nodes);
-    println!("tour length: {:?}", get_tour_length(&nodes.iter().collect::<Vec<_>>()));
-    println!("brute force optimization history: {:?}", tsp_brute_force(&nodes));
+    println!(
+        "tour length: {:?}",
+        get_tour_length(&nodes.iter().collect::<Vec<_>>())
+    );
+    println!(
+        "brute force optimization history: {:?}",
+        tsp_brute_force(&nodes)
+    );
 
     let nn_tour = tsp_nearest_neighbor(&nodes);
     println!("nearest neighbor path: {:?}", &nn_tour);
-    println!("nearest neighbor length: {:?}", get_tour_length(&nn_tour.iter().collect::<Vec<_>>()));
+    println!(
+        "nearest neighbor length: {:?}",
+        get_tour_length(&nn_tour.iter().collect::<Vec<_>>())
+    );
 
     // let hc_history = tsp_hill_climb(&nodes);
     // let sa_history = tsp_simulated_annealing(&nodes);
