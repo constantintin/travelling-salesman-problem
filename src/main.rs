@@ -122,6 +122,14 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
         return Err("can't to draw empty tour".into());
     }
     let root = BitMapBackend::new(filename, (1111, 1111)).into_drawing_area();
+    let root = root.titled(
+        &format!(
+            "'{}', tour length: {}",
+            filename,
+            get_tour_length(&nodes.iter().collect::<Vec<_>>())
+        ),
+        TextStyle::from(("sans-serif", 24).into_font()).color(&WHITE),
+    )?;
 
     root.fill(&RGBColor(245, 245, 245))?;
 
@@ -160,7 +168,7 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
     root.draw(&PathElement::new(
         edge_points,
         ShapeStyle::from(&BLACK).filled(),
-    ));
+    ))?;
 
     root.present()?;
     Ok(())
