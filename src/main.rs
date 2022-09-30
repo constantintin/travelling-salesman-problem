@@ -123,7 +123,7 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
     }
     let root = BitMapBackend::new(filename, (1111, 1111)).into_drawing_area();
 
-    root.fill(&RGBColor(240, 200, 200))?;
+    root.fill(&RGBColor(245, 245, 245))?;
 
     let root = root.apply_coord_spec(Cartesian2d::<RangedCoordf64, RangedCoordf64>::new(
         0f64..1f64,
@@ -136,11 +136,10 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
             + Circle::new((0, 0), 7, ShapeStyle::from(&BLACK).filled())
             + Text::new(
                 format!("{}", node.id),
-                (10, 0),
-                ("sans-serif", 15.0).into_font(),
+                (13, 0),
+                ("sans-serif", 23.0).into_font(),
             );
     };
-
 
     //
     // draw nodes
@@ -160,7 +159,7 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
     edge_points.insert(0, *edge_points.last().unwrap());
     root.draw(&PathElement::new(
         edge_points,
-        ShapeStyle::from(&RED).filled(),
+        ShapeStyle::from(&BLACK).filled(),
     ));
 
     root.present()?;
