@@ -5,6 +5,9 @@ use std::hash::{Hash, Hasher};
 use itertools::Itertools;
 use rand::Rng;
 
+use plotters::coord::types::RangedCoordf64;
+use plotters::prelude::*;
+
 #[derive(Debug, Clone)]
 struct Node {
     id: usize,
@@ -113,27 +116,77 @@ fn tsp_nearest_neighbor(nodes: &Vec<Node>) -> Vec<Node> {
 //     todo!();
 // }
 
+/// draw tour with plotters to filename
+fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error::Error>> {
+    if nodes.is_empty() {
+        return Err("can't to draw empty tour".into());
+    }
+    let root = BitMapBackend::new(filename, (1111, 1111)).into_drawing_area();
+
+    root.fill(&RGBColor(240, 200, 200))?;
+
+    let root = root.apply_coord_spec(Cartesian2d::<RangedCoordf64, RangedCoordf64>::new(
+        0f64..1f64,
+        0f64..1f64,
+        (0..1000, 0..1000),
+    ));
+
+    let dot_and_id = |node: &Node| {
+        return EmptyElement::at((node.x, node.y))
+            + Circle::new((0, 0), 7, ShapeStyle::from(&BLACK).filled())
+            + Text::new(
+                format!("{}", node.id),
+                (10, 0),
+                ("sans-serif", 15.0).into_font(),
+            );
+    };
+
+
+    //
+    // draw nodes
+    //
+    for node in nodes {
+        root.draw(&dot_and_id(node))?;
+    }
+
+    //
+    // draw edges
+    //
+    let mut edge_points = nodes
+        .iter()
+        .map(|n| (n.x, n.y))
+        .collect::<Vec<(f64, f64)>>();
+    // edge_points is just transformed nodes, which can't be empty
+    edge_points.insert(0, *edge_points.last().unwrap());
+    root.draw(&PathElement::new(
+        edge_points,
+        ShapeStyle::from(&RED).filled(),
+    ));
+
+    root.present()?;
+    Ok(())
+}
+
 fn main() {
     let N = 10;
     let nodes = random_nodes(N);
 
-    // println!("{:?}", nodes);
     println!(
-        "tour length: {:?}",
+        "random tour length: {:?}",
         get_tour_length(&nodes.iter().collect::<Vec<_>>())
-    );
-    println!(
-        "brute force optimization history: {:?}",
-        tsp_brute_force(&nodes)
     );
 
     let nn_tour = tsp_nearest_neighbor(&nodes);
-    println!("nearest neighbor path: {:?}", &nn_tour);
+
     println!(
         "nearest neighbor length: {:?}",
         get_tour_length(&nn_tour.iter().collect::<Vec<_>>())
     );
 
-    // let hc_history = tsp_hill_climb(&nodes);
-    // let sa_history = tsp_simulated_annealing(&nodes);
+    if let Err(err) = draw_tour("random.png", &nodes) {
+        println!("Error drawing:\n{}", err);
+    }
+    if let Err(err) = draw_tour("nn.png", &nn_tour) {
+        println!("Error drawing:\n{}", err);
+    }
 }
