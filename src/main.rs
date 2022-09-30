@@ -47,6 +47,26 @@ fn get_tour_length(nodes: &[&Node]) -> f64 {
     length
 }
 
+/// considers every possible unique permutation (n-1)!
+///
+/// (some permutations are the same, e.g. [0, 1, 2] = [1, 2, 0])
+/// can be optimized by keeping the first node the same
+/// and probably checking uniqueness upfront somehow
+/// not the point tho, just getting my feet wet here
+fn tsp_brute_force(nodes: &Vec<Node>) -> Vec<f64> {
+    let mut optimization_hc: Vec<f64> = Vec::new();
+    let mut optimal_length = f64::INFINITY;
+    // loop over all possible unique tours
+    for tour in nodes.iter().permutations(nodes.len()).unique() {
+        let new_length = get_tour_length(&tour);
+        if  new_length < optimal_length {
+            optimal_length = new_length;
+            optimization_hc.push(optimal_length);
+        }
+    }
+    optimization_hc
+}
+
 // fn tsp_hill_climb(nodes: &Vec<Node>) -> Vec<f64> {
 //     todo!();
 // }
@@ -59,8 +79,9 @@ fn main() {
     let N = 10;
     let nodes = random_nodes(N);
 
-    println!("{:?}", nodes)
+    println!("{:?}", nodes);
     println!("tour length: {:?}", get_tour_length(&nodes.iter().collect::<Vec<_>>()));
+    println!("brute force optimization history: {:?}", tsp_brute_force(&nodes));
 
     // let hc_history = tsp_hill_climb(&nodes);
     // let sa_history = tsp_simulated_annealing(&nodes);
