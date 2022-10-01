@@ -125,7 +125,7 @@ fn tsp_nearest_neighbor(nodes: &Vec<Node>) -> Vec<Node> {
 /// draw tour with plotters to filename
 fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error::Error>> {
     if nodes.is_empty() {
-        return Err("can't to draw empty tour".into());
+        return Err("can't draw empty tour".into());
     }
     let root = BitMapBackend::new(filename, (1111, 1111)).into_drawing_area();
     let root = root.titled(
