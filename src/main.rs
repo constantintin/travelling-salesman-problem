@@ -65,21 +65,27 @@ fn get_tour_length(nodes: &[&Node]) -> f64 {
 /// considers every possible unique permutation (n-1)!
 ///
 /// (some permutations are the same, e.g. [0, 1, 2] = [1, 2, 0])
-/// can be optimized by keeping the first node the same
-/// and probably checking uniqueness upfront somehow
+/// can be optimized by
+/// keeping the first node the same
+/// checking uniqueness
 /// not the point tho, just getting my feet wet here
-fn tsp_brute_force(nodes: &Vec<Node>) -> Vec<f64> {
-    let mut optimization_hc: Vec<f64> = Vec::new();
+fn tsp_brute_force(nodes: &Vec<Node>) -> Vec<Node> {
+    let mut optimal_tour: Vec<&Node> = Vec::new();
     let mut optimal_length = f64::INFINITY;
     // loop over all possible unique tours
     for tour in nodes.iter().permutations(nodes.len()).unique() {
         let new_length = get_tour_length(&tour);
         if new_length < optimal_length {
             optimal_length = new_length;
-            optimization_hc.push(optimal_length);
+            optimal_tour = tour.clone();
         }
     }
-    optimization_hc
+
+    let mut return_tour = Vec::new();
+    for n in optimal_tour {
+        return_tour.push(n.clone());
+    }
+    return_tour
 }
 
 /// start at first node and always choose closest next node
@@ -238,7 +244,7 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
 }
 
 fn main() {
-    let N = 13;
+    let N = 10;
     let nodes = random_nodes(N);
     println!(
         "random tour length: {:?}",
@@ -257,6 +263,11 @@ fn main() {
         get_tour_length(&sa_tour.iter().collect::<Vec<_>>())
     );
 
+    let optimal_tour = tsp_brute_force(&nodes);
+    println!(
+        "optimal length: {:?}",
+        get_tour_length(&optimal_tour.iter().collect::<Vec<_>>())
+    );
 
     if let Err(err) = draw_tour("random.png", &nodes) {
         println!("Error drawing:\n{}", err);
@@ -265,6 +276,9 @@ fn main() {
         println!("Error drawing:\n{}", err);
     }
     if let Err(err) = draw_tour("sa.png", &sa_tour) {
+        println!("Error drawing:\n{}", err);
+    }
+    if let Err(err) = draw_tour("optimal.png", &optimal_tour) {
         println!("Error drawing:\n{}", err);
     }
 }
