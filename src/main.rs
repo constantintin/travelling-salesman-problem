@@ -69,6 +69,7 @@ fn get_tour_length(nodes: &[&Node]) -> f64 {
 /// keeping the first node the same
 /// checking uniqueness
 /// not the point tho, just getting my feet wet here
+#[allow(dead_code)]
 fn tsp_brute_force(nodes: &Vec<Node>) -> Vec<Node> {
     let mut optimal_tour: Vec<&Node> = Vec::new();
     let mut optimal_length = f64::INFINITY;
@@ -151,7 +152,7 @@ fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<Node> {
     let mut temp = START_TEMP;
     let mut current_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
 
-    for iteration in 0..ITERATIONS {
+    for _ in 0..ITERATIONS {
         history.push(current_length);
         let (a, b) = random_swap(&mut annealed);
         let new_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
