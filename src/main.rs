@@ -114,13 +114,70 @@ fn tsp_nearest_neighbor(nodes: &Vec<Node>) -> Vec<Node> {
     nearest_neighbor
 }
 
-// fn tsp_hill_climb(nodes: &Vec<Node>) -> Vec<f64> {
-//     todo!();
-// }
+/// swap two random nodes, returning the swapped indices
+/// indices are never equal
+fn random_swap(nodes: &mut Vec<Node>) -> (usize, usize) {
+    let mut rng = rand::thread_rng();
+    let a = rng.gen_range(0..nodes.len());
+    let b = loop {
+        let random = rng.gen_range(0..nodes.len());
+        if random != a {
+            break random;
+        }
+    };
 
-// fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<f64> {
-//     todo!();
-// }
+    nodes.swap(a, b);
+    (a, b)
+}
+
+/// searches for best tour by randomly swapping Nodes,
+/// accepting swaps with shorter tours.
+/// swaps that beget longer tours are accepted based on a
+/// probability function that decreases over time
+fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<Node> {
+    const ITERATIONS: u32 = 10000;
+    const START_TEMP: f64 = 3.0;
+    const COOLING_FACTOR: f64 = 0.88;
+
+    let mut history: Vec<f64> = Vec::new();
+    let mut rng = rand::thread_rng();
+    let mut annealed = nodes.clone();
+    let mut temp = START_TEMP;
+    let mut current_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
+
+    for iteration in 0..ITERATIONS {
+        history.push(current_length);
+        let (a, b) = random_swap(&mut annealed);
+        let new_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
+        let delta = new_length - current_length;
+
+        // probability to accept swap
+        let probability = if delta > 0.0 {
+            f64::exp(-(delta / temp))
+        } else {
+            1.0
+        };
+
+        // debugging
+        // println!("length: {:.7}, temp: {:.7}, delta: {:.7} prob: {:.7}", current_length, temp, delta, probability);
+
+        // swap back if longer + failed probability test
+        if rng.gen::<f64>() > probability {
+            annealed.swap(a, b);
+        } else {
+            current_length = new_length;
+        }
+
+        // cooling
+        temp = COOLING_FACTOR * temp;
+
+        // add to history
+    }
+
+    history.push(current_length);
+
+    annealed
+}
 
 /// draw tour with plotters to filename
 fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error::Error>> {
@@ -181,25 +238,33 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
 }
 
 fn main() {
-    let N = 10;
+    let N = 13;
     let nodes = random_nodes(N);
-
     println!(
         "random tour length: {:?}",
         get_tour_length(&nodes.iter().collect::<Vec<_>>())
     );
 
     let nn_tour = tsp_nearest_neighbor(&nodes);
-
     println!(
         "nearest neighbor length: {:?}",
         get_tour_length(&nn_tour.iter().collect::<Vec<_>>())
     );
 
+    let sa_tour = tsp_simulated_annealing(&nodes);
+    println!(
+        "sa length: {:?}",
+        get_tour_length(&sa_tour.iter().collect::<Vec<_>>())
+    );
+
+
     if let Err(err) = draw_tour("random.png", &nodes) {
         println!("Error drawing:\n{}", err);
     }
     if let Err(err) = draw_tour("nn.png", &nn_tour) {
+        println!("Error drawing:\n{}", err);
+    }
+    if let Err(err) = draw_tour("sa.png", &sa_tour) {
         println!("Error drawing:\n{}", err);
     }
 }
