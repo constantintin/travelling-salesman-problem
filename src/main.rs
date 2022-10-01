@@ -141,15 +141,18 @@ fn random_swap(nodes: &mut Vec<Node>) -> (usize, usize) {
 /// accepting swaps with shorter tours.
 /// swaps that beget longer tours are accepted based on a
 /// probability function that decreases over time
+///
+/// parameters open for more tuning
 fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<Node> {
     const ITERATIONS: u32 = 10000;
-    const START_TEMP: f64 = 3.0;
+    const TEMP_0_FACTOR: f64 = 3.3;
     const COOLING_FACTOR: f64 = 0.88;
 
     let mut history: Vec<f64> = Vec::new();
     let mut rng = rand::thread_rng();
     let mut annealed = nodes.clone();
-    let mut temp = START_TEMP;
+    //different graph sizes seem to call for different beginning temperaturs?
+    let mut temp = nodes.len() as f64 / TEMP_0_FACTOR;
     let mut current_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
 
     for _ in 0..ITERATIONS {
@@ -245,7 +248,7 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
 }
 
 fn main() {
-    let N = 10;
+    let N = 13;
     let nodes = random_nodes(N);
     println!(
         "random tour length: {:?}",
