@@ -53,6 +53,12 @@ fn get_tour_length(nodes: &[&Node]) -> f64 {
             _ => unreachable!(".windows should guarantee slices of 2 always"),
         }
     }
+    // if vector has at least 1 element, add distance from last to first node
+    if let Some(first) = nodes.iter().nth(0) {
+        if let Some(last) = nodes.iter().last() {
+            length += node_distance(last, first);
+        }
+    }
     length
 }
 
