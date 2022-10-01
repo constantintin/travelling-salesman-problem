@@ -247,6 +247,8 @@ fn draw_tour(filename: &str, nodes: &Vec<Node>) -> Result<(), Box<dyn std::error
     Ok(())
 }
 
+// this https://www.youtube.com/watch?v=GiDsjIBOVoA
+// has been super helpful to get me started
 fn main() {
     let N = 13;
     let nodes = random_nodes(N);
