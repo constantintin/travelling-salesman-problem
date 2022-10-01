@@ -336,4 +336,13 @@ mod tests {
         ];
         assert_eq!(get_tour_length(&tour.iter().collect::<Vec<_>>()), 4.0);
     }
+
+    #[test]
+    fn test_random_swap_back() {
+        let mut tour = random_nodes(7);
+        let check = tour.clone();
+        let (a, b) = random_swap(&mut tour);
+        tour.swap(a, b);
+        assert_eq!(tour, check);
+    }
 }
