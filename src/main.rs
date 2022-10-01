@@ -263,11 +263,11 @@ fn main() {
         get_tour_length(&sa_tour.iter().collect::<Vec<_>>())
     );
 
-    let optimal_tour = tsp_brute_force(&nodes);
-    println!(
-        "optimal length: {:?}",
-        get_tour_length(&optimal_tour.iter().collect::<Vec<_>>())
-    );
+    // let optimal_tour = tsp_brute_force(&nodes);
+    // println!(
+    //     "optimal length: {:?}",
+    //     get_tour_length(&optimal_tour.iter().collect::<Vec<_>>())
+    // );
 
     if let Err(err) = draw_tour("random.png", &nodes) {
         println!("Error drawing:\n{}", err);
@@ -278,7 +278,7 @@ fn main() {
     if let Err(err) = draw_tour("sa.png", &sa_tour) {
         println!("Error drawing:\n{}", err);
     }
-    if let Err(err) = draw_tour("optimal.png", &optimal_tour) {
-        println!("Error drawing:\n{}", err);
-    }
+    // if let Err(err) = draw_tour("optimal.png", &optimal_tour) {
+    //     println!("Error drawing:\n{}", err);
+    // }
 }
