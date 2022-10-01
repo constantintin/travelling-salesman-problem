@@ -286,3 +286,54 @@ fn main() {
     //     println!("Error drawing:\n{}", err);
     // }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn test_node_distance_simple() {
+        assert_eq!(
+            node_distance(
+                &Node {
+                    id: 0,
+                    x: 0.0,
+                    y: 0.0,
+                },
+                &Node {
+                    id: 0,
+                    x: 0.0,
+                    y: 1.0,
+                }
+            ),
+            1.0
+        );
+    }
+
+    #[test]
+    fn test_tour_length_simple() {
+        let tour = vec![
+            Node {
+                id: 0,
+                x: 0.0,
+                y: 0.0,
+            },
+            Node {
+                id: 0,
+                x: 1.0,
+                y: 0.0,
+            },
+            Node {
+                id: 0,
+                x: 1.0,
+                y: 1.0,
+            },
+            Node {
+                id: 0,
+                x: 0.0,
+                y: 1.0,
+            },
+        ];
+        assert_eq!(get_tour_length(&tour.iter().collect::<Vec<_>>()), 4.0);
+    }
+}
