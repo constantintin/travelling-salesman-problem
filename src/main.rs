@@ -148,7 +148,6 @@ fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<Node> {
     const TEMP_0_FACTOR: f64 = 3.3;
     const COOLING_FACTOR: f64 = 0.88;
 
-    let mut history: Vec<f64> = Vec::new();
     let mut rng = rand::thread_rng();
     let mut annealed = nodes.clone();
     //different graph sizes seem to call for different beginning temperaturs?
@@ -156,7 +155,6 @@ fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<Node> {
     let mut current_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
 
     for _ in 0..ITERATIONS {
-        history.push(current_length);
         let (a, b) = random_swap(&mut annealed);
         let new_length = get_tour_length(&annealed.iter().collect::<Vec<_>>());
         let delta = new_length - current_length;
@@ -183,8 +181,6 @@ fn tsp_simulated_annealing(nodes: &Vec<Node>) -> Vec<Node> {
 
         // add to history
     }
-
-    history.push(current_length);
 
     annealed
 }
